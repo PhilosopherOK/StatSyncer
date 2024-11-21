@@ -11,27 +11,33 @@ public class SalesAndTrafficByAsinService {
 
     private final SalesAndTrafficByAsinRepository salesAndTrafficByAsinRepository;
 
+    // Конструктор сервісу для ініціалізації репозиторію
     public SalesAndTrafficByAsinService(SalesAndTrafficByAsinRepository salesAndTrafficByAsinRepository) {
         this.salesAndTrafficByAsinRepository = salesAndTrafficByAsinRepository;
     }
 
+    // Метод для видалення всіх записів
     public void deleteAll(){
         salesAndTrafficByAsinRepository.deleteAll();
     }
 
+    // Метод для пошуку за списком ASIN батьків
     public List<SalesAndTrafficByAsin> findByParentAsin(List<String> parentAsin){
         return salesAndTrafficByAsinRepository.findByParentAsinIn(parentAsin);
     }
 
+    // Метод для отримання підсумків продажів та трафіку
     public SalesAndTrafficByAsin getSummarizedSalesAndTraffic() {
         List<SalesAndTrafficByAsin> salesAndTrafficList = salesAndTrafficByAsinRepository.findAll();
 
+        // Створення об'єкта для підсумкових даних
         SalesAndTrafficByAsin summary = new SalesAndTrafficByAsin();
         summary.setParentAsin("Total Summary");
 
         SalesByAsin totalSales = new SalesByAsin();
         TrafficByAsin totalTraffic = new TrafficByAsin();
 
+        // Обчислення підсумків для всіх записів
         for (SalesAndTrafficByAsin item : salesAndTrafficList) {
             SalesByAsin sales = item.getSalesByAsin();
             sumSales(totalSales, sales);
@@ -45,7 +51,7 @@ public class SalesAndTrafficByAsinService {
         return summary;
     }
 
-
+    // Метод для підсумовування даних про продажі
     private SalesByAsin sumSales(SalesByAsin totalSales, SalesByAsin sales){
         totalSales.setOrderedProductSales(sumAmounts(totalSales.getOrderedProductSales(), sales.getOrderedProductSales()));
         totalSales.setOrderedProductSalesB2B(sumAmounts(totalSales.getOrderedProductSalesB2B(), sales.getOrderedProductSalesB2B()));
@@ -56,6 +62,7 @@ public class SalesAndTrafficByAsinService {
         return totalSales;
     }
 
+    // Метод для підсумовування даних про трафік
     private TrafficByAsin sumTraffic(TrafficByAsin totalTraffic, TrafficByAsin traffic){
         totalTraffic.setBrowserSessions(totalTraffic.getBrowserSessions() + traffic.getBrowserSessions());
         totalTraffic.setBrowserSessionsB2B(totalTraffic.getBrowserSessionsB2B() + traffic.getBrowserSessionsB2B());
@@ -82,6 +89,7 @@ public class SalesAndTrafficByAsinService {
         return totalTraffic;
     }
 
+    // Метод для підсумовування сум
     private Amount sumAmounts(Amount total, Amount addition) {
         if (total == null){
             total = new Amount();

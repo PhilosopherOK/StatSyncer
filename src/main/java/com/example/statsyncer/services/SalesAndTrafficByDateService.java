@@ -11,47 +11,49 @@ public class SalesAndTrafficByDateService {
 
     private final SalesAndTrafficByDateRepository salesAndTrafficByDateRepository;
 
-
+    // Конструктор сервісу, який ініціалізує репозиторій
     public SalesAndTrafficByDateService(SalesAndTrafficByDateRepository salesAndTrafficByDateRepository) {
         this.salesAndTrafficByDateRepository = salesAndTrafficByDateRepository;
     }
 
+    // Метод для пошуку даних за списком дат
     public List<SalesAndTrafficByDate> findByDate(List<String> dates) {
         return salesAndTrafficByDateRepository.findByDateIn(dates);
     }
 
+    // Метод для видалення всіх записів з таблиці
     public void deleteAll() {
         salesAndTrafficByDateRepository.deleteAll();
     }
 
-
+    // Метод для отримання підсумкових даних продажу та трафіку
     public SalesAndTrafficByDate getSummarizedSalesAndTraffic() {
-        // Получаем все объекты SalesAndTrafficByDate
         List<SalesAndTrafficByDate> salesAndTrafficList = salesAndTrafficByDateRepository.findAll();
 
-        // Создаем итоговый объект для хранения сумм
+        // Створюємо підсумковий об'єкт зберігання сум
         SalesAndTrafficByDate summary = new SalesAndTrafficByDate();
         summary.setDate("Total Summary");
 
-        // Суммируем данные
+        // Підсумовуємо дані
         SalesByDate totalSales = new SalesByDate();
         TrafficByDate totalTraffic = new TrafficByDate();
         for (SalesAndTrafficByDate item : salesAndTrafficList) {
-            // Суммируем SalesByDate
+            // Підсумовуємо SalesByDate
             SalesByDate sales = item.getSalesByDate();
             sumSales(totalSales, sales);
 
-            // Суммируем TrafficByDate
+            // Підсумовуємо TrafficByDate
             TrafficByDate traffic = item.getTrafficByDate();
             sumTraffic(totalTraffic, traffic);
         }
 
-        // Устанавливаем итоговые значения
+        // Встановлюємо підсумкові значення
         summary.setSalesByDate(totalSales);
         summary.setTrafficByDate(totalTraffic);
         return summary;
     }
 
+    // Метод для підсумовування даних по продажам
     private SalesByDate sumSales(SalesByDate totalSales, SalesByDate sales) {
         totalSales.setOrderedProductSales(sumAmounts(totalSales.getOrderedProductSales(), sales.getOrderedProductSales()));
         totalSales.setOrderedProductSalesB2B(sumAmounts(totalSales.getOrderedProductSalesB2B(), sales.getOrderedProductSalesB2B()));
@@ -75,6 +77,7 @@ public class SalesAndTrafficByDateService {
         return totalSales;
     }
 
+    // Метод для підсумовування даних по трафіку
     private TrafficByDate sumTraffic(TrafficByDate totalTraffic, TrafficByDate traffic) {
         totalTraffic.setBrowserPageViews(totalTraffic.getBrowserPageViews() + traffic.getBrowserPageViews());
         totalTraffic.setBrowserPageViewsB2B(totalTraffic.getBrowserPageViewsB2B() + traffic.getBrowserPageViewsB2B());
@@ -103,8 +106,7 @@ public class SalesAndTrafficByDateService {
         return totalTraffic;
     }
 
-
-    // Метод для суммирования Amount
+    // Метод для підсумовування Amount
     private Amount sumAmounts(Amount total, Amount addition) {
         if (total == null) {
             total = new Amount();
@@ -117,3 +119,4 @@ public class SalesAndTrafficByDateService {
         return total;
     }
 }
+
