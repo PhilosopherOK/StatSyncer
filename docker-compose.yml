@@ -1,0 +1,30 @@
+  services:
+    # MongoDB service
+    mongodb:
+      image: mongo:latest
+      container_name: mongodb
+      ports:
+        - "27017:27017"  # MongoDB порт
+      volumes:
+        - mongodb_data:/data/db  # Хранение данных MongoDB на локальной машине
+      networks:
+        - backend
+
+    # Redis service
+    redis:
+      image: redis:latest
+      container_name: redis
+      ports:
+        - "6379:6379"  # Redis порт
+      networks:
+        - backend
+
+  # Определение томов для хранения данных
+  volumes:
+    mongodb_data:
+
+  # Определение сетей
+  networks:
+    backend:
+      driver: bridge
+
